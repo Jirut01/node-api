@@ -14,6 +14,8 @@ var app = express();
 var cors = require('cors');  app.use(cors());
 require('dotenv').config();
 const mongoose = require('mongoose');
+const auth = require('./middleware/auth');
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
