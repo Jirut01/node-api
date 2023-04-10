@@ -72,7 +72,7 @@ router.post("/login", async (req, res, next) => {
       res.status(200).json(user);
     }
 
-    res.status.send("invalid credentials");
+    res.status(500).send("invalid credentials");
   } catch (error) {
     console.log(error);
   }
