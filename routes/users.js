@@ -10,16 +10,15 @@ router.post("/register", async (req, res, next) => {
   try {
     const { first_name, last_name, username, password } = req.body;
 
+
     if (!(first_name && last_name && username && password)) {
       res.status(400).send("All input is required");
     }
 
     const oldUser = await User.find({ username });
-
-    if (oldUser) {
+    if (oldUser.length > 0) {
       return res.status(409).send("User already exist. Please login");
     }
-
     encryptedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
