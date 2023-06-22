@@ -4,22 +4,22 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/users");
 const auth = require("../middleware/auth");
+const getToken = require("../middleware/get_token")
 
 /* GET users listing. */
 router.post("/register", async (req, res, next) => {
   try {
     const { first_name, last_name, username, password } = req.body;
 
+
     if (!(first_name && last_name && username && password)) {
       res.status(400).send("All input is required");
     }
 
     const oldUser = await User.find({ username });
-
-    if (oldUser) {
+    if (oldUser.length > 0) {
       return res.status(409).send("User already exist. Please login");
     }
-
     encryptedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
@@ -30,16 +30,8 @@ router.post("/register", async (req, res, next) => {
     });
 
     //create token
-    const token = jwt.sign(
-      { user_id: user._id, username },
-      process.env.TOKEN_KEY,
-      {
-        expiresIn: "2h",
-      }
-    );
-
     //save user token
-    user.token = token;
+    user.token = getToken(user,username,"2h");
 
     res.status(201).json(user);
   } catch (err) {
@@ -59,26 +51,17 @@ router.post("/login", async (req, res, next) => {
     const user = await User.findOne({ username });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      const token = jwt.sign(
-        { user_id: user._id, username },
-        process.env.TOKEN_KEY,
-        {
-          expiresIn: "2h",
-        }
-      );
-
-      user.token = token;
-
+      user.token = getToken(user,username,"2h");
       res.status(200).json(user);
     }
 
-    res.status.send("invalid credentials");
+    res.status(500).send("invalid credentials");
   } catch (error) {
     console.log(error);
   }
 });
 
-router.post("/welcome", auth, (req, res, next) => {
+router.post("/checkaut", auth, (req, res, next) => {
   res.status(200).send({
     message: "get success",
     success: true,

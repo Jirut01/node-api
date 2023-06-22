@@ -4,7 +4,7 @@ const productsModel = require("../models/products");
 const auth = require('../middleware/auth');
 
 //create
-router.post("/", async (req, res) => {
+router.post("/",auth, async (req, res) => {
   try {
     let { product_id, product_name, description, price, amount, image } =
       req.body;
@@ -33,7 +33,7 @@ router.post("/", async (req, res) => {
 });
 
 //get user all
-router.get("/", async (req, res) => {
+router.get("/", auth, async (req, res) => {
   try {
     let products = await productsModel.find();
     return res.status(201).send({
@@ -50,7 +50,7 @@ router.get("/", async (req, res) => {
 });
 
 //get data by id
-router.get("/:id", async (req, res) => {
+router.get("/:id", auth, async (req, res) => {
   try {
     let id = req.params.id;
     let products = await productsModel.findById(id);
@@ -68,7 +68,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // delete
-router.delete("/:id", async (req, res) => {
+router.delete("/:id",auth, async (req, res) => {
   try {
     let id = req.params.id;
     await productsModel.deleteOne({ _id: id });
@@ -87,7 +87,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 //update data
-router.put("/:id", async (req, res) => {
+router.put("/:id",auth, async (req, res) => {
   try {
     let id = req.params.id;
     let { product_id, product_name, description, price, amount, image } =
@@ -121,7 +121,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-router.put("/stock/:id", async (req, res) => {
+router.put("/stock/:id",auth, async (req, res) => {
   try {
   let id = req.params.id;
   let amount = req.body.amount;
