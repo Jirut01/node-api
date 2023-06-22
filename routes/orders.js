@@ -2,9 +2,10 @@ const express = require("express");
 var router = express.Router();
 const ordersModel = require("../models/orders");
 const productsModel = require("../models/products");
+const auth = require('../middleware/auth');
 
 //create
-router.post("/", async (req, res) => {
+router.post("/",auth, async (req, res) => {
   try {
     let body = req.body;
     console.log(body.detail);
@@ -48,7 +49,7 @@ router.post("/", async (req, res) => {
 });
 
 //get order all
-router.get("/", async (req, res) => {
+router.get("/",auth, async (req, res) => {
   try {
     let orders = await ordersModel.find();
     return res.status(201).send({
@@ -65,7 +66,7 @@ router.get("/", async (req, res) => {
 });
 
 //get by id
-router.get("/:id", async (req, res) => {
+router.get("/:id",auth, async (req, res) => {
   try {
     let id = req.params.id;
     let orders = await ordersModel.findById(id);
