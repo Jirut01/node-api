@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/users");
 const auth = require("../middleware/auth");
+const getToken = require("../middleware/get_token")
 
 /* GET users listing. */
 router.post("/register", async (req, res, next) => {
@@ -29,16 +30,8 @@ router.post("/register", async (req, res, next) => {
     });
 
     //create token
-    const token = jwt.sign(
-      { user_id: user._id, username },
-      process.env.TOKEN_KEY,
-      {
-        expiresIn: "2h",
-      }
-    );
-
     //save user token
-    user.token = token;
+    user.token = getToken(user,username,"2h");
 
     res.status(201).json(user);
   } catch (err) {
@@ -58,16 +51,7 @@ router.post("/login", async (req, res, next) => {
     const user = await User.findOne({ username });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      const token = jwt.sign(
-        { user_id: user._id, username },
-        process.env.TOKEN_KEY,
-        {
-          expiresIn: "2h",
-        }
-      );
-
-      user.token = token;
-
+      user.token = getToken(user,username,"2h");
       res.status(200).json(user);
     }
 
@@ -77,7 +61,7 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
-router.post("/welcome", auth, (req, res, next) => {
+router.post("/checkaut", auth, (req, res, next) => {
   res.status(200).send({
     message: "get success",
     success: true,
